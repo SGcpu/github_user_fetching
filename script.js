@@ -1,21 +1,39 @@
-async function github() {
+const form  = document.querySelector('form')
+
+form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const userelement = document.getElementById('username');
+    const user = userelement.value;
+
+    github(user)
+})
+
+async function github(user='') {
     try {
         const response = await fetch("https://api.github.com/users");
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        const data = await response.json();
+        let data = await response.json();
         console.log(data);
-
+        if(user!=''){
+            const personal = await fetch(`https://api.github.com/users/${user}`)
+            
+            if (!personal.ok) {
+                alert("User not found!");
+                return; 
+            }
+            const user_data = await personal.json();
+            data = [user_data, ...data,]
+        }
         const parent = document.querySelector('.container');
 
         if (!parent) {
             console.error("Error: '.container' element not found in HTML.");
             return;
         }
-
+        parent.innerHTML = "";
         for (let user of data) {
             const user_box = document.createElement("div");
 
